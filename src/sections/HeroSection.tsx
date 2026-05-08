@@ -1,68 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import SplitText from "gsap/SplitText";
-import FlyerSection, { FLYER_IMAGES } from "./FlyerSection";
+import FlyerSection from "./FlyerSection";
 
 gsap.registerPlugin(SplitText);
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLElement | null>(null);
-  const [flyersReady, setFlyersReady] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const preloadImage = (src: string, timeoutMs = 4500) =>
-      new Promise<void>((resolve) => {
-        const image = new Image();
-        let settled = false;
-
-        const finish = () => {
-          if (settled) return;
-          settled = true;
-          resolve();
-        };
-
-        const timeoutId = window.setTimeout(finish, timeoutMs);
-
-        image.onload = () => {
-          window.clearTimeout(timeoutId);
-          finish();
-        };
-
-        image.onerror = () => {
-          window.clearTimeout(timeoutId);
-          finish();
-        };
-
-        image.src = src;
-
-        if (image.complete) {
-          window.clearTimeout(timeoutId);
-          finish();
-        }
-      });
-
-    const preloadFlyers = async () => {
-      await Promise.all(FLYER_IMAGES.map((flyer) => preloadImage(flyer.src)));
-
-      if (!cancelled) {
-        setFlyersReady(true);
-      }
-    };
-
-    void preloadFlyers();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useGSAP(
     () => {
-      if (!flyersReady) return;
-
       const container = containerRef.current;
       if (!container) return;
 
@@ -129,7 +77,7 @@ export default function HeroSection() {
           "+=0.3",
         );
     },
-    { scope: containerRef, dependencies: [flyersReady], revertOnUpdate: true },
+    { scope: containerRef, revertOnUpdate: true },
   );
 
   return (
@@ -150,11 +98,6 @@ export default function HeroSection() {
             <h1 className=" worship display-title wrap-break-word text-[10vw] font-black leading-[0.9] text-center uppercase w-full">
               Worship <br /> Unscripted
             </h1>
-            {!flyersReady ? (
-              <p className="mt-4 text-sm font-medium tracking-wide text-[rgba(248,208,110,0.9)]">
-                Loading event visuals...
-              </p>
-            ) : null}
           </div>
         </div>
       </div>

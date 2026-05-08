@@ -2,16 +2,14 @@ import { useState, useRef } from "react";
 import RegisterDialog from "#/sections/RegisterDialog";
 import Navbar from "#/components/Navbar";
 
-export const FLYER_IMAGES = [
-  { id: 1, src: "/images/worship-background.jpeg", alt: "Main Event" },
-  { id: 2, src: "/images/worship-1.jpeg", alt: "Special Guest" },
-  { id: 3, src: "/images/worship-2.jpeg", alt: "Youth Night" },
-  { id: 4, src: "/images/worship-3.jpeg", alt: "Sunday Service" },
-] as const;
-
 export default function FlyerSection() {
   const marqueeRef = useRef(null);
-  const [flyers, setFlyers] = useState([...FLYER_IMAGES]);
+  const [flyers, setFlyers] = useState([
+    { id: 1, src: "/images/worship-background.jpeg", alt: "Main Event" },
+    { id: 2, src: "/images/worship-1.jpeg", alt: "Special Guest" },
+    { id: 3, src: "/images/worship-2.jpeg", alt: "Youth Night" },
+    { id: 4, src: "/images/worship-3.jpeg", alt: "Sunday Service" },
+  ]);
 
   const handleSwap = (index: number) => {
     const newFlyers = [...flyers];
@@ -36,9 +34,6 @@ export default function FlyerSection() {
             src={flyers[0].src}
             alt={flyers[0].alt}
             className="w-full lg:h-[800px] py-4 object-contain rounded-2xl border border-white/10"
-            loading="eager"
-            decoding="async"
-            fetchPriority="high"
           />
         </div>
 
@@ -55,8 +50,6 @@ export default function FlyerSection() {
                   src={flyer.src}
                   alt={flyer.alt}
                   className="w-full h-32 lg:h-58 object-cover rounded-xl border-2 border-transparent hover:border-yellow-400 transition-all opacity-60 hover:opacity-100"
-                  loading="lazy"
-                  decoding="async"
                 />
               </div>
             ))}

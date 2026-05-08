@@ -109,7 +109,7 @@ export default function HeroSection() {
 
           <div className="h-28 w-28" />
 
-          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-center font-bold text-[rgba(248,208,110,1)] w-full">
+          <div className="absolute bottom-40 lg:bottom-20 left-1/2 -translate-x-1/2 text-center font-bold text-[rgba(248,208,110,1)] w-full">
             <h1 className="worship display-title wrap-break-word text-[10vw] font-black leading-[0.9] text-center uppercase w-full opacity-0">
               Worship <br /> Unscripted
             </h1>

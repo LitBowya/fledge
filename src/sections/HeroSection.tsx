@@ -43,15 +43,30 @@ export default function HeroSection() {
           "radial-gradient(circle var(--mask-size) at 50% var(--mask-y), transparent 99%, black 100%)",
       });
 
-      tl.from(".scripture", {
+      gsap.set(".scripture", {
         y: -100,
         opacity: 0,
+      });
+      gsap.set(".worship", {
+        opacity: 0,
+      });
+      gsap.set(worshipSplitText.chars, {
+        y: 200,
+        opacity: 0,
+      });
+
+      tl.to(".scripture", {
+        y: 0,
+        opacity: 1,
         duration: 1,
         stagger: 0.3,
       })
-      .from(worshipSplitText.chars, {
-        y: 200,
-        opacity: 0,
+      .set(".worship", {
+        opacity: 1,
+      })
+      .to(worshipSplitText.chars, {
+        y: 0,
+        opacity: 1,
         duration: 1,
         stagger: {
           amount: 0.25,
@@ -84,9 +99,9 @@ export default function HeroSection() {
     <section ref={containerRef} className="relative">
       <FlyerSection />
 
-      <div className="cover min-h-screen absolute inset-0 z-30 pointer-events-none bg-black flex flex-col items-center justify-center gap-20">
+      <div className="cover min-h-screen absolute inset-0 z-100 pointer-events-none bg-black flex flex-col items-center justify-center gap-20">
         <div className="relative border w-full h-full">
-          <div className="scripture absolute top-20 left-1/2 -translate-x-1/2 text-center font-bold text-[rgba(248,208,110,1)] w-full">
+          <div className="scripture absolute top-20 left-1/2 -translate-x-1/2 text-center font-bold text-[rgba(248,208,110,1)] w-full opacity-0">
             <p className="italic">(JOHN 4:23-24)</p>
             <p className="text-xl">IN SPIRIT AND IN TRUTH</p>
             <p className="text-xl">THE UNFILTERED WORSHIP</p>
@@ -94,8 +109,8 @@ export default function HeroSection() {
 
           <div className="h-28 w-28" />
 
-          <div className=" absolute bottom-20 left-1/2 -translate-x-1/2 text-center font-bold text-[rgba(248,208,110,1)] w-full">
-            <h1 className=" worship display-title wrap-break-word text-[10vw] font-black leading-[0.9] text-center uppercase w-full">
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-center font-bold text-[rgba(248,208,110,1)] w-full">
+            <h1 className="worship display-title wrap-break-word text-[10vw] font-black leading-[0.9] text-center uppercase w-full opacity-0">
               Worship <br /> Unscripted
             </h1>
           </div>

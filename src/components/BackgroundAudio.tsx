@@ -9,7 +9,7 @@ export default function BackgroundAudio() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.volume = 0.4;
+    audio.volume = 0.05;
 
     let hasStarted = false;
 
@@ -53,7 +53,9 @@ export default function BackgroundAudio() {
     <audio
       ref={audioRef}
       src={WORSHIP_AUDIO_SRC}
+      autoPlay
       loop
+      playsInline
       preload="auto"
       aria-hidden="true"
       className="hidden"

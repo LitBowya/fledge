@@ -13,23 +13,39 @@ export default function HeroSection() {
   useEffect(() => {
     let cancelled = false;
 
+    const preloadImage = (src: string, timeoutMs = 4500) =>
+      new Promise<void>((resolve) => {
+        const image = new Image();
+        let settled = false;
+
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          resolve();
+        };
+
+        const timeoutId = window.setTimeout(finish, timeoutMs);
+
+        image.onload = () => {
+          window.clearTimeout(timeoutId);
+          finish();
+        };
+
+        image.onerror = () => {
+          window.clearTimeout(timeoutId);
+          finish();
+        };
+
+        image.src = src;
+
+        if (image.complete) {
+          window.clearTimeout(timeoutId);
+          finish();
+        }
+      });
+
     const preloadFlyers = async () => {
-      await Promise.all(
-        FLYER_IMAGES.map((flyer) => {
-          return new Promise<void>((resolve) => {
-            const image = new Image();
-            image.src = flyer.src;
-
-            if (image.complete) {
-              resolve();
-              return;
-            }
-
-            image.onload = () => resolve();
-            image.onerror = () => resolve();
-          });
-        }),
-      );
+      await Promise.all(FLYER_IMAGES.map((flyer) => preloadImage(flyer.src)));
 
       if (!cancelled) {
         setFlyersReady(true);

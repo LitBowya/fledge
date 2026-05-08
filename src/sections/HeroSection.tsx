@@ -1,16 +1,67 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import SplitText from "gsap/SplitText";
-import FlyerSection from "./FlyerSection";
+import FlyerSection, { FLYER_IMAGES } from "./FlyerSection";
 
 gsap.registerPlugin(SplitText);
 
 export default function HeroSection() {
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLElement | null>(null);
+  const [flyersReady, setFlyersReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const preloadFlyers = async () => {
+      await Promise.all(
+        FLYER_IMAGES.map((flyer) => {
+          return new Promise<void>((resolve) => {
+            const image = new Image();
+            image.src = flyer.src;
+
+            if (image.complete) {
+              resolve();
+              return;
+            }
+
+            image.onload = () => resolve();
+            image.onerror = () => resolve();
+          });
+        }),
+      );
+
+      if (!cancelled) {
+        setFlyersReady(true);
+      }
+    };
+
+    void preloadFlyers();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useGSAP(
     () => {
+      if (!flyersReady) return;
+
+      const container = containerRef.current;
+      if (!container) return;
+
+      const applyCoverMask = () => {
+        const target = container.querySelector<HTMLElement>(".cover");
+        if (!target) return;
+
+        const y = gsap.getProperty(target, "--mask-y");
+        const size = gsap.getProperty(target, "--mask-size");
+        const mask = `radial-gradient(circle ${size} at 50% ${y}, transparent 99%, black 100%)`;
+
+        target.style.webkitMaskImage = mask;
+        target.style.maskImage = mask;
+      };
+
       const tl = gsap.timeline();
       const worshipSplitText = SplitText.create(".worship", {
         type: "chars",
@@ -40,23 +91,15 @@ export default function HeroSection() {
         duration: 1,
         stagger: {
           amount: 0.25,
-          from: 'random'
-        }
+          from: "random",
+        },
       })
         // 1. Drop and Bounce (Animating the Y variable)
         .to(".cover", {
           "--mask-y": "50%",
           duration: 1.5,
           ease: "bounce.out",
-          onUpdate: function () {
-            // Force update the mask string during animation
-            const target = containerRef.current.querySelector(".cover");
-            const y = gsap.getProperty(target, "--mask-y");
-            const size = gsap.getProperty(target, "--mask-size");
-            const mask = `radial-gradient(circle ${size} at 50% ${y}, transparent 99%, black 100%)`;
-            target.style.webkitMaskImage = mask;
-            target.style.maskImage = mask;
-          },
+          onUpdate: applyCoverMask,
         })
         // 2. Scale up (Animating the Size variable)
         .to(
@@ -65,19 +108,12 @@ export default function HeroSection() {
             "--mask-size": "1500px",
             duration: 1.5,
             ease: "power4.inOut",
-            onUpdate: function () {
-              const target = containerRef.current.querySelector(".cover");
-              const y = gsap.getProperty(target, "--mask-y");
-              const size = gsap.getProperty(target, "--mask-size");
-              const mask = `radial-gradient(circle ${size} at 50% ${y}, transparent 99%, black 100%)`;
-              target.style.webkitMaskImage = mask;
-              target.style.maskImage = mask;
-            },
+            onUpdate: applyCoverMask,
           },
           "+=0.3",
         );
     },
-    { scope: containerRef },
+    { scope: containerRef, dependencies: [flyersReady], revertOnUpdate: true },
   );
 
   return (
@@ -98,6 +134,11 @@ export default function HeroSection() {
             <h1 className=" worship display-title wrap-break-word text-[10vw] font-black leading-[0.9] text-center uppercase w-full">
               Worship <br /> Unscripted
             </h1>
+            {!flyersReady ? (
+              <p className="mt-4 text-sm font-medium tracking-wide text-[rgba(248,208,110,0.9)]">
+                Loading event visuals...
+              </p>
+            ) : null}
           </div>
         </div>
       </div>

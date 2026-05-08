@@ -2,14 +2,17 @@ import { useState, useRef } from "react";
 import RegisterDialog from "#/sections/RegisterDialog";
 import Navbar from "#/components/Navbar";
 
+export const FLYER_IMAGES = [
+  { id: 1, src: "/images/worship-background.jpeg", alt: "Main Event" },
+  { id: 2, src: "/images/worship-1.jpeg", alt: "Special Guest" },
+  { id: 3, src: "/images/worship-2.jpeg", alt: "Youth Night" },
+  { id: 4, src: "/images/worship-3.jpeg", alt: "Sunday Service" },
+] as const;
+
 export default function FlyerSection() {
   const marqueeRef = useRef(null);
-  const [flyers, setFlyers] = useState([
-    { id: 1, src: "/images/worship-background.jpeg", alt: "Main Event" },
-    { id: 2, src: "/images/worship-1.jpeg", alt: "Special Guest" },
-    { id: 3, src: "/images/worship-2.jpeg", alt: "Youth Night" },
-    { id: 4, src: "/images/worship-3.jpeg", alt: "Sunday Service" },
-  ]);
+  const [flyers, setFlyers] = useState([...FLYER_IMAGES]);
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
 
   const handleSwap = (index: number) => {
     const newFlyers = [...flyers];
@@ -23,17 +26,31 @@ export default function FlyerSection() {
 
   // We duplicate the side flyers (slice(1)) to create a seamless loop
   const sideFlyers = flyers.slice(1);
+  const mainImageLoaded = loadedImages.has(flyers[0].src);
 
   return (
     <section className="min-h-screen w-full flex items-center p-4 lg:p-8 bg-[rgb(255,252,230)]">
-        <Navbar />
+      <Navbar />
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-7xl mx-auto w-full border border-white/20 rounded-3xl p-6 overflow-hidden">
         {/* LARGE FLYER */}
-        <div className="lg:col-span-3 z-20">
+        <div className="relative lg:col-span-3 z-20">
+          {!mainImageLoaded ? (
+            <div className="absolute inset-0 animate-pulse rounded-2xl border border-white/10 bg-zinc-200/70" />
+          ) : null}
           <img
             src={flyers[0].src}
             alt={flyers[0].alt}
             className="w-full lg:h-[800px] py-4 object-contain rounded-2xl border border-white/10"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            onLoad={() =>
+              setLoadedImages((prev) => {
+                const next = new Set(prev);
+                next.add(flyers[0].src);
+                return next;
+              })
+            }
           />
         </div>
 
@@ -48,7 +65,18 @@ export default function FlyerSection() {
               >
                 <img
                   src={flyer.src}
+                  alt={flyer.alt}
                   className="w-full h-32 lg:h-58 object-cover rounded-xl border-2 border-transparent hover:border-yellow-400 transition-all opacity-60 hover:opacity-100"
+                  loading="lazy"
+                  decoding="async"
+                  onLoad={() =>
+                    setLoadedImages((prev) => {
+                      if (prev.has(flyer.src)) return prev;
+                      const next = new Set(prev);
+                      next.add(flyer.src);
+                      return next;
+                    })
+                  }
                 />
               </div>
             ))}

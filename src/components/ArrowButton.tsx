@@ -21,7 +21,7 @@ const ArrowButton = forwardRef<
 
   return (
     <div className="fixed z-100 bottom-5 right-5 flex flex-col items-center justify-center">
-      <ArrowBigDown className="arrow size-12" />
+      <ArrowBigDown className=" text-black arrow size-12" />
 
       <Button
         ref={ref}

@@ -9,7 +9,7 @@ export default function BackgroundAudio() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.volume = 0.05;
+    audio.volume = 0.1;
 
     let hasStarted = false;
 
